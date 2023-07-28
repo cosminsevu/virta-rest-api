@@ -1,0 +1,39 @@
+image: docker:latest
+
+stages:
+  - build
+  - deploy
+
+variables:
+  EXTERNAL_SERVICE_STAGE_API_BASE_URL: https://127.0.0.1/
+  REMOTE_SERVER_IP: 127.0.0.1
+  REMOTE_SERVER_USER: gitlab
+  DOCKER_COMPOSE_FILE: ./docker-compose.yml
+  MYSQL_PASSWORD: virtapass
+  MYSQL_DATABASE: virtaapi
+  MYSQL_USER: virtauser
+
+
+build:
+  stage: build
+  script:
+    - echo "EXTERNAL_SERVICE_KEY=$EXTERNAL_SERVICE_STAGE_KEY" >> .env
+    - echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
+    - echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
+    - echo "MYSQL_USER=$MYSQL_USER" >> .env
+    - docker-compose build
+    - docker-compose push
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - echo "MYSQL_PASSWORD=$MYSQL_PASSWORD" >> .env
+    - echo "MYSQL_DATABASE=$MYSQL_DATABASE" >> .env
+    - echo "MYSQL_USER=$MYSQL_USER" >> .env
+    - docker-compose down --remove-orphans
+    - docker-compose pull
+    - docker-compose up -d 
+  only:
+    - main

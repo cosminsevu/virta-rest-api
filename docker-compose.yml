@@ -1,0 +1,22 @@
+version: '3'
+services:
+  laravel:
+    build:
+      context: ./virta-rest-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - laravel_mysql
+  laravel_mysql:
+    image: mysql:8.0.33
+    container_name: laravel_mysql
+    volumes:
+      - ./db_data/db:/var/lib/mysql
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=virtaapi
+      - MYSQL_ROOT_USER=root
+    restart: always
+    ports:
+      - "3307:3306"
